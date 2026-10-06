@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Navbar Fragment -->
+    <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/}">
+                <i class="bi bi-trophy-fill text-warning fs-4"></i>
+                <span class="brand-logo fs-4">Fútbol Cloud</span>
+                <span class="badge bg-dark border border-secondary text-light ms-1 small">MongoDB Atlas</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-dismiss="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${paginaActiva == 'formulario' ? 'active' : ''}" th:href="@{/}">
+                            <i class="bi bi-plus-circle-fill me-1 text-success"></i> Nuevo Club
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${paginaActiva == 'listar' ? 'active' : ''}" th:href="@{/listar}">
+                            <i class="bi bi-table me-1 text-info"></i> Listado de Clubes
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <a th:href="@{/api/clubes}" target="_blank" class="btn btn-sm btn-outline-light rounded-pill px-3 d-flex align-items-center gap-1">
+                        <i class="bi bi-code-slash text-warning"></i> API JSON
+                    </a>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill d-none d-md-inline-flex align-items-center gap-1">
+                        <i class="bi bi-shield-shaded"></i> <span th:text="${totalClubes != null ? totalClubes + ' Clubes' : 'Colección Atlas'}">0 Clubes</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Footer Fragment -->
+    <footer th:fragment="footer" class="py-4 mt-auto text-center border-top bg-white">
+        <div class="container">
+            <p class="mb-1 text-muted">
+                Desarrollado con <strong>Spring Boot 4 / MVC</strong> + <strong>Thymeleaf</strong> + <strong>MongoDB Cloud Atlas</strong> + <strong>Bootstrap 5</strong>
+            </p>
+            <p class="mb-0 small text-secondary">
+                CRUD Clubes de Fútbol API REST — Arquitectura con Entidades Embebidas
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

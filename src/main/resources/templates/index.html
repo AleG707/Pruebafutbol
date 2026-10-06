@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/head :: head(${modoEdicion ? 'Editar Club - Fútbol Cloud' : 'Nuevo Club - Fútbol Cloud'})}">
+    <title>Nuevo Club - Fútbol Cloud</title>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <!-- Contenido Principal -->
+    <main class="container my-5 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-md-11">
+
+                <!-- Alertas Flash -->
+                <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 shadow-sm rounded-3" role="alert">
+                    <i class="bi bi-check-circle-fill fs-5"></i>
+                    <div th:text="${mensajeExito}">Operación exitosa</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 shadow-sm rounded-3" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                    <div th:text="${mensajeError}">Error en la operación</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- Tarjeta Principal del Formulario -->
+                <div class="card main-card">
+                    <div class="card-header card-header-custom p-4">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <span class="badge badge-cloud mb-2">
+                                    <i class="bi bi-cloud-check-fill me-1"></i> MongoDB Cloud Atlas — Colección 'clubesfutbol'
+                                </span>
+                                <h3 class="fw-bold mb-1" th:text="${modoEdicion ? 'Editar Club de Fútbol' : 'Registrar Nuevo Club de Fútbol'}">
+                                    Registrar Club de Fútbol
+                                </h3>
+                                <p class="text-muted small mb-0">
+                                    Completa la información del club, su director técnico y su asociación o federación vinculada.
+                                </p>
+                            </div>
+                            <div th:if="${modoEdicion}">
+                                <span class="badge-id">
+                                    <i class="bi bi-hash"></i> ID: <span th:text="${club.id}">1</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5">
+                        <form th:action="@{/guardar}" th:object="${club}" method="post" novalidate>
+
+                            <!-- Campo Oculto ID -->
+                            <input type="hidden" th:field="*{id}" />
+
+                            <!-- ========================================== -->
+                            <!-- SECCIÓN 1: DATOS DEL CLUB                  -->
+                            <!-- ========================================== -->
+                            <div class="mb-4">
+                                <h5 class="section-header">
+                                    <i class="bi bi-shield-shaded text-success me-1"></i> 1. Información Principal del Club
+                                </h5>
+                                <div class="mb-3">
+                                    <label for="nombre" class="form-label fw-semibold text-dark">
+                                        Nombre Oficial del Club <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-shield"></i></span>
+                                        <input type="text" 
+                                               id="nombre" 
+                                               th:field="*{nombre}" 
+                                               class="form-control" 
+                                               th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''" 
+                                               placeholder="Ej: Millonarios Fútbol Club" 
+                                               required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}">
+                                            El nombre del club es obligatorio.
+                                        </div>
+                                    </div>
+                                    <div class="form-text text-muted">Nombre de la institución deportiva (mínimo 2, máximo 100 caracteres).</div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4 text-muted opacity-25">
+
+                            <!-- ========================================== -->
+                            <!-- SECCIÓN 2: ENTRENADOR (EMBEBIDO)           -->
+                            <!-- ========================================== -->
+                            <div class="mb-4">
+                                <h5 class="section-header">
+                                    <i class="bi bi-person-badge-fill text-primary me-1"></i> 2. Director Técnico (Entrenador Embebido)
+                                </h5>
+                                <p class="text-muted small mb-3">
+                                    Equivale a una relación <code>@OneToOne</code> en JPA, almacenado como subdocumento atómico en MongoDB.
+                                </p>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="entrenadorNombre" class="form-label fw-semibold">Nombre:</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                            <input type="text" 
+                                                   id="entrenadorNombre" 
+                                                   th:field="*{entrenador.nombre}" 
+                                                   class="form-control" 
+                                                   th:classappend="${#fields.hasErrors('entrenador.nombre')} ? 'is-invalid' : ''" 
+                                                   placeholder="Ej: Alberto">
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('entrenador.nombre')}" th:errors="*{entrenador.nombre}">
+                                                Nombre obligatorio.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="entrenadorApellido" class="form-label fw-semibold">Apellido:</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-person-lines-fill"></i></span>
+                                            <input type="text" 
+                                                   id="entrenadorApellido" 
+                                                   th:field="*{entrenador.apellido}" 
+                                                   class="form-control" 
+                                                   th:classappend="${#fields.hasErrors('entrenador.apellido')} ? 'is-invalid' : ''" 
+                                                   placeholder="Ej: Gamero">
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('entrenador.apellido')}" th:errors="*{entrenador.apellido}">
+                                                Apellido obligatorio.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="entrenadorEdad" class="form-label fw-semibold">Edad (18 - 99 años):</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                                            <input type="number" 
+                                                   id="entrenadorEdad" 
+                                                   th:field="*{entrenador.edad}" 
+                                                   min="18" max="99" 
+                                                   class="form-control" 
+                                                   th:classappend="${#fields.hasErrors('entrenador.edad')} ? 'is-invalid' : ''" 
+                                                   placeholder="Ej: 60">
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('entrenador.edad')}" th:errors="*{entrenador.edad}">
+                                                Edad entre 18 y 99 años.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="entrenadorNacionalidad" class="form-label fw-semibold">Nacionalidad:</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                            <input type="text" 
+                                                   id="entrenadorNacionalidad" 
+                                                   th:field="*{entrenador.nacionalidad}" 
+                                                   class="form-control" 
+                                                   th:classappend="${#fields.hasErrors('entrenador.nacionalidad')} ? 'is-invalid' : ''" 
+                                                   placeholder="Ej: Colombiana">
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('entrenador.nacionalidad')}" th:errors="*{entrenador.nacionalidad}">
+                                                Nacionalidad obligatoria.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4 text-muted opacity-25">
+
+                            <!-- ========================================== -->
+                            <!-- SECCIÓN 3: ASOCIACIÓN (EMBEBIDA)           -->
+                            <!-- ========================================== -->
+                            <div class="mb-4">
+                                <h5 class="section-header">
+                                    <i class="bi bi-globe-americas text-warning me-1"></i> 3. Asociación / Federación (Embebida)
+                                </h5>
+                                <p class="text-muted small mb-3">
+                                    Equivale a una relación <code>@ManyToOne</code> en JPA, embebida para acceso directo desnormalizado.
+                                </p>
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label for="asociacionNombre" class="form-label fw-semibold">Nombre de la Asociación:</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                            <input type="text" 
+                                                   id="asociacionNombre" 
+                                                   th:field="*{asociacion.nombre}" 
+                                                   class="form-control" 
+                                                   th:classappend="${#fields.hasErrors('asociacion.nombre')} ? 'is-invalid' : ''" 
+                                                   placeholder="Ej: Federación Colombiana de Fútbol (FCF)">
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('asociacion.nombre')}" th:errors="*{asociacion.nombre}">
+                                                Nombre de asociación obligatorio.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="asociacionPais" class="form-label fw-semibold">País:</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-flag"></i></span>
+                                            <input type="text" 
+                                                   id="asociacionPais" 
+                                                   th:field="*{asociacion.pais}" 
+                                                   class="form-control" 
+                                                   th:classappend="${#fields.hasErrors('asociacion.pais')} ? 'is-invalid' : ''" 
+                                                   placeholder="Ej: Colombia">
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('asociacion.pais')}" th:errors="*{asociacion.pais}">
+                                                País obligatorio.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="asociacionPresidente" class="form-label fw-semibold">Presidente:</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-person-gear"></i></span>
+                                            <input type="text" 
+                                                   id="asociacionPresidente" 
+                                                   th:field="*{asociacion.presidente}" 
+                                                   class="form-control" 
+                                                   th:classappend="${#fields.hasErrors('asociacion.presidente')} ? 'is-invalid' : ''" 
+                                                   placeholder="Ej: Ramón Jesurún">
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('asociacion.presidente')}" th:errors="*{asociacion.presidente}">
+                                                Presidente obligatorio.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div class="d-flex flex-wrap gap-2 pt-3">
+                                <button type="submit" class="btn btn-primary-custom d-flex align-items-center gap-2 flex-grow-1 justify-content-center">
+                                    <i class="bi" th:classappend="${modoEdicion ? 'bi-arrow-repeat' : 'bi-save2-fill'}"></i>
+                                    <span th:text="${modoEdicion ? 'Actualizar Club' : 'Guardar Club en MongoDB Atlas'}">Guardar Club</span>
+                                </button>
+
+                                <a th:if="${modoEdicion}" th:href="@{/}" class="btn btn-secondary-custom d-flex align-items-center gap-1">
+                                    <i class="bi bi-x-circle"></i> Cancelar
+                                </a>
+
+                                <a th:href="@{/listar}" class="btn btn-secondary-custom d-flex align-items-center gap-1">
+                                    <i class="bi bi-table"></i> Ver Listado
+                                </a>
+                            </div>
+
+                        </form>
+                    </div>
+
+                    <!-- Footer Informativo -->
+                    <div class="card-footer bg-light border-0 px-4 py-3">
+                        <div class="d-flex align-items-center gap-2 text-muted small">
+                            <i class="bi bi-info-circle-fill text-primary"></i>
+                            <span>
+                                <strong>Secuencias Atómicas:</strong> El ID del club, jugadores y competiciones se generan mediante el servicio <span class="badge bg-secondary">SequenceGeneratorService</span> en MongoDB Atlas.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/navbar :: footer}"></div>
+
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

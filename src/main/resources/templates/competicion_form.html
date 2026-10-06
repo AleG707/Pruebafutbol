@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/head :: head(${modoEdicion ? 'Editar Competición - ' + club.nombre : 'Inscribir Competición - ' + club.nombre})}">
+    <title>Formulario de Competición - Fútbol Cloud</title>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <!-- Contenido Principal -->
+    <main class="container my-5 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-9">
+
+                <!-- Tarjeta del Formulario -->
+                <div class="card main-card">
+                    <div class="card-header card-header-custom p-4">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle mb-2">
+                                    <i class="bi bi-trophy-fill me-1"></i> <span th:text="${club.nombre}">Club</span>
+                                </span>
+                                <h3 class="fw-bold mb-1" th:text="${modoEdicion ? 'Editar Competición' : 'Inscribir Torneo / Competición'}">
+                                    Inscribir Torneo
+                                </h3>
+                                <p class="text-muted small mb-0">
+                                    Se almacenará en la lista embebida de competiciones del club en MongoDB Atlas.
+                                </p>
+                            </div>
+                            <div th:if="${modoEdicion}">
+                                <span class="badge-id">
+                                    <i class="bi bi-hash"></i> ID: <span th:text="${competicion.id}">1</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5">
+                        <form th:action="@{/club/{id}/competicion/guardar(id=${clubId})}" th:object="${competicion}" method="post" novalidate>
+
+                            <!-- Campo Oculto ID -->
+                            <input type="hidden" th:field="*{id}" />
+
+                            <!-- Nombre del Torneo -->
+                            <div class="mb-4">
+                                <label for="nombre" class="form-label fw-semibold text-dark">
+                                    Nombre Oficial del Torneo / Competición <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-trophy"></i></span>
+                                    <input type="text" 
+                                           id="nombre" 
+                                           th:field="*{nombre}" 
+                                           class="form-control" 
+                                           th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''" 
+                                           placeholder="Ej: Copa Libertadores de América" 
+                                           required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}">
+                                        El nombre del torneo es obligatorio.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Monto del Premio -->
+                            <div class="mb-4">
+                                <label for="montoPremio" class="form-label fw-semibold text-dark">
+                                    Monto del Premio Económico (COP / USD) <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-cash-stack"></i></span>
+                                    <input type="number" 
+                                           id="montoPremio" 
+                                           th:field="*{montoPremio}" 
+                                           min="0" 
+                                           class="form-control" 
+                                           th:classappend="${#fields.hasErrors('montoPremio')} ? 'is-invalid' : ''" 
+                                           placeholder="Ej: 500000000" 
+                                           required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('montoPremio')}" th:errors="*{montoPremio}">
+                                        El monto debe ser mayor o igual a 0.
+                                    </div>
+                                </div>
+                                <div class="form-text text-muted">Ingrese el valor total del premio asignado al torneo.</div>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <!-- Fecha Inicio -->
+                                <div class="col-md-6">
+                                    <label for="fechaInicio" class="form-label fw-semibold text-dark">
+                                        Fecha de Inicio <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-calendar-check"></i></span>
+                                        <input type="date" 
+                                               id="fechaInicio" 
+                                               th:field="*{fechaInicio}" 
+                                               class="form-control" 
+                                               th:classappend="${#fields.hasErrors('fechaInicio')} ? 'is-invalid' : ''" 
+                                               required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('fechaInicio')}" th:errors="*{fechaInicio}">
+                                            Fecha de inicio obligatoria.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Fecha Fin -->
+                                <div class="col-md-6">
+                                    <label for="fechaFin" class="form-label fw-semibold text-dark">
+                                        Fecha de Finalización <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-calendar-x"></i></span>
+                                        <input type="date" 
+                                               id="fechaFin" 
+                                               th:field="*{fechaFin}" 
+                                               class="form-control" 
+                                               th:classappend="${#fields.hasErrors('fechaFin')} ? 'is-invalid' : ''" 
+                                               required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('fechaFin')}" th:errors="*{fechaFin}">
+                                            La fecha de fin no puede ser anterior a la fecha de inicio.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="d-flex flex-wrap gap-2 pt-2">
+                                <button type="submit" class="btn btn-primary-custom d-flex align-items-center gap-2 flex-grow-1 justify-content-center">
+                                    <i class="bi" th:classappend="${modoEdicion ? 'bi-arrow-repeat' : 'bi-save2-fill'}"></i>
+                                    <span th:text="${modoEdicion ? 'Actualizar Competición' : 'Registrar Competición'}">Registrar Competición</span>
+                                </button>
+                                <a th:href="@{/detalle/{id}(id=${clubId})}" class="btn btn-secondary-custom d-flex align-items-center gap-1">
+                                    <i class="bi bi-x-circle"></i> Cancelar
+                                </a>
+                            </div>
+
+                        </form>
+                    </div>
+
+                    <div class="card-footer bg-light border-0 px-4 py-3">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle text-primary me-1"></i> Secuencia <code>competicion_sequence</code> asignada automáticamente en MongoDB Atlas.
+                        </small>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/navbar :: footer}"></div>
+
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
