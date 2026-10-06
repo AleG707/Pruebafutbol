@@ -1,5 +1,6 @@
 package com.crudclubes_apirest.app.controladores;
 
+import com.crudclubes_apirest.app.entidades.asociacion;
 import com.crudclubes_apirest.app.entidades.club;
 import com.crudclubes_apirest.app.entidades.competicion;
 import com.crudclubes_apirest.app.entidades.entrenador;
@@ -14,6 +15,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -56,6 +59,54 @@ public class club_web {
         model.addAttribute("totalClubes", listaClubes.size());
         model.addAttribute("paginaActiva", "listar");
         return "listar";
+    }
+
+    /**
+     * Restablece la base de datos eliminando registros corruptos y cargando los datos iniciales de prueba (Millonarios y Santa Fe).
+     */
+    @GetMapping({"/restablecer-datos", "/club/restablecer-datos"})
+    public String restablecerDatos(RedirectAttributes redirectAttributes) {
+        try {
+            clubRepositorio.deleteAll();
+
+            // 1. Club Millonarios FC
+            club millonarios = new club();
+            millonarios.setId(sequenceGeneratorService.generateSequence(club.SEQUENCE_NAME));
+            millonarios.setNombre("Millonarios Fútbol Club");
+            millonarios.setEntrenador(new entrenador("Alberto", "Gamero", 60, "Colombiana"));
+            millonarios.setAsociacion(new asociacion("Federación Colombiana de Fútbol (FCF)", "Colombia", "Ramón Jesurún"));
+
+            millonarios.addJugador(new jugador(sequenceGeneratorService.generateSequence(jugador.SEQUENCE_NAME), "David", "Silva", 14, "Mediocampista"));
+            millonarios.addJugador(new jugador(sequenceGeneratorService.generateSequence(jugador.SEQUENCE_NAME), "Leonardo", "Castro", 23, "Delantero"));
+            millonarios.addJugador(new jugador(sequenceGeneratorService.generateSequence(jugador.SEQUENCE_NAME), "Álvaro", "Montero", 31, "Portero"));
+            millonarios.addJugador(new jugador(sequenceGeneratorService.generateSequence(jugador.SEQUENCE_NAME), "Juan Pablo", "Vargas", 3, "Defensa"));
+
+            millonarios.addCompeticion(new competicion(sequenceGeneratorService.generateSequence(competicion.SEQUENCE_NAME), "Superliga BetPlay", 500000000, LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 24)));
+            millonarios.addCompeticion(new competicion(sequenceGeneratorService.generateSequence(competicion.SEQUENCE_NAME), "Copa Postobón (Copa Colombia)", 600000000, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 11, 20)));
+            millonarios.addCompeticion(new competicion(sequenceGeneratorService.generateSequence(competicion.SEQUENCE_NAME), "Copa Libertadores de América", 2000000000, LocalDate.of(2026, 4, 1), LocalDate.of(2026, 11, 30)));
+
+            // 2. Club Independiente Santa Fe
+            club santaFe = new club();
+            santaFe.setId(sequenceGeneratorService.generateSequence(club.SEQUENCE_NAME));
+            santaFe.setNombre("Independiente Santa Fe");
+            santaFe.setEntrenador(new entrenador("Pablo", "Peirano", 49, "Uruguaya"));
+            santaFe.setAsociacion(new asociacion("Federación Colombiana de Fútbol (FCF)", "Colombia", "Ramón Jesurún"));
+
+            santaFe.addJugador(new jugador(sequenceGeneratorService.generateSequence(jugador.SEQUENCE_NAME), "Hugo", "Rodallega", 11, "Delantero"));
+            santaFe.addJugador(new jugador(sequenceGeneratorService.generateSequence(jugador.SEQUENCE_NAME), "Daniel", "Torres", 16, "Mediocampista"));
+            santaFe.addJugador(new jugador(sequenceGeneratorService.generateSequence(jugador.SEQUENCE_NAME), "Andrés", "Mosquera", 1, "Portero"));
+            santaFe.addJugador(new jugador(sequenceGeneratorService.generateSequence(jugador.SEQUENCE_NAME), "Jhojan", "Torres", 8, "Defensa"));
+
+            santaFe.addCompeticion(new competicion(sequenceGeneratorService.generateSequence(competicion.SEQUENCE_NAME), "Superliga BetPlay", 500000000, LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 24)));
+            santaFe.addCompeticion(new competicion(sequenceGeneratorService.generateSequence(competicion.SEQUENCE_NAME), "Copa Postobón (Copa Colombia)", 600000000, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 11, 20)));
+            santaFe.addCompeticion(new competicion(sequenceGeneratorService.generateSequence(competicion.SEQUENCE_NAME), "Copa Libertadores de América", 2000000000, LocalDate.of(2026, 4, 1), LocalDate.of(2026, 11, 30)));
+
+            clubRepositorio.saveAll(Arrays.asList(millonarios, santaFe));
+            redirectAttributes.addFlashAttribute("mensajeExito", "¡Base de datos en MongoDB Atlas restablecida con éxito con los clubes y planteles de prueba!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al restablecer la base de datos: " + e.getMessage());
+        }
+        return "redirect:/listar";
     }
 
     /**

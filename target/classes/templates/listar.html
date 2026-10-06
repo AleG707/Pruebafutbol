@@ -53,6 +53,12 @@
                                     </button>
                                 </div>
                             </form>
+                            <a th:href="@{/restablecer-datos}" 
+                               onclick="return confirm('¿Desea restablecer la colección en MongoDB Atlas con los clubes y planteles de prueba predeterminados (Millonarios y Santa Fe)?');"
+                               class="btn btn-outline-warning d-flex align-items-center gap-1 text-nowrap" 
+                               title="Recargar datos iniciales">
+                                <i class="bi bi-arrow-clockwise"></i> Restablecer Datos
+                            </a>
                             <a th:href="@{/}" class="btn btn-primary-custom d-flex align-items-center gap-2 text-nowrap">
                                 <i class="bi bi-plus-circle-fill"></i> Nuevo Club
                             </a>
