@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Java-Version: 17
+Build-Jdk-Spec: 25
+Implementation-Title: CRUD-clubes-apirest
+Implementation-Version: 1
+Created-By: Maven Integration for Eclipse
+

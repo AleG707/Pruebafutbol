@@ -1,0 +1,12 @@
+com\crudclubes_apirest\app\config\MongoConfig.class
+com\crudclubes_apirest\app\CrudClubesApirestApplication.class
+com\crudclubes_apirest\app\controladores\club_apirest.class
+com\crudclubes_apirest\app\entidades\club.class
+com\crudclubes_apirest\app\entidades\entrenador.class
+com\crudclubes_apirest\app\entidades\jugador.class
+com\crudclubes_apirest\app\entidades\asociacion.class
+com\crudclubes_apirest\app\entidades\competicion.class
+com\crudclubes_apirest\app\controladores\club_web.class
+com\crudclubes_apirest\app\entidades\DatabaseSequence.class
+com\crudclubes_apirest\app\servicios\SequenceGeneratorService.class
+com\crudclubes_apirest\app\repositorios\club_repositorio.class

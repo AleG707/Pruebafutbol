@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/head :: head('Listado de Clubes - Fútbol Cloud')}">
+    <title>Listado de Clubes - Fútbol Cloud</title>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <!-- Contenido Principal -->
+    <main class="container my-5 flex-grow-1">
+
+        <!-- Alertas Flash -->
+        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 shadow-sm rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <div th:text="${mensajeExito}">Operación exitosa</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 shadow-sm rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <div th:text="${mensajeError}">Error en la operación</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Encabezado y Barra de Búsqueda -->
+        <div class="card main-card mb-4">
+            <div class="card-body p-4">
+                <div class="row align-items-center justify-content-between g-3">
+                    <div class="col-md-5">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-success-subtle text-success p-3 rounded-4 fs-3">
+                                <i class="bi bi-shield-shaded"></i>
+                            </div>
+                            <div>
+                                <h3 class="fw-bold mb-0">Clubes de Fútbol</h3>
+                                <p class="text-muted small mb-0">Gestión de clubes y sus entidades embebidas en MongoDB Atlas</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="d-flex flex-wrap align-items-center justify-content-md-end gap-2">
+                            <!-- Formulario de Búsqueda -->
+                            <form th:action="@{/buscar}" method="get" class="d-flex gap-2 flex-grow-1 flex-md-grow-0">
+                                <div class="input-group">
+                                    <input type="text" 
+                                           name="nombre" 
+                                           th:value="${terminoBusqueda}" 
+                                           class="form-control" 
+                                           placeholder="Buscar club por nombre...">
+                                    <button class="btn btn-outline-secondary" type="submit">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                            <a th:href="@{/}" class="btn btn-primary-custom d-flex align-items-center gap-2 text-nowrap">
+                                <i class="bi bi-plus-circle-fill"></i> Nuevo Club
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Clubes -->
+        <div class="card main-card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">ID</th>
+                                <th>Club</th>
+                                <th>Director Técnico</th>
+                                <th>Asociación</th>
+                                <th class="text-center">Plantel</th>
+                                <th class="text-center">Competiciones</th>
+                                <th class="text-end" style="width: 250px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Iteración de Clubes -->
+                            <tr th:each="club : ${clubes}">
+                                <td>
+                                    <span class="badge-id" th:text="${'#' + club.id}">#1</span>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark fs-6" th:text="${club.nombre}">Millonarios FC</div>
+                                    <small class="text-muted">Documento Raíz</small>
+                                </td>
+                                <td>
+                                    <div th:if="${club.entrenador != null}">
+                                        <div class="fw-semibold text-dark">
+                                            <i class="bi bi-person-fill text-primary me-1"></i>
+                                            <span th:text="${club.entrenador.nombreCompleto}">Alberto Gamero</span>
+                                        </div>
+                                        <small class="text-muted" th:text="${club.entrenador.edad + ' años • ' + club.entrenador.nacionalidad}">60 años • Colombiana</small>
+                                    </div>
+                                    <div th:unless="${club.entrenador != null}">
+                                        <span class="badge bg-light text-muted border">Sin entrenador</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div th:if="${club.asociacion != null}">
+                                        <div class="fw-semibold text-dark">
+                                            <i class="bi bi-globe text-warning me-1"></i>
+                                            <span th:text="${club.asociacion.nombre}">FCF</span>
+                                        </div>
+                                        <small class="text-muted" th:text="${club.asociacion.pais}">Colombia</small>
+                                    </div>
+                                    <div th:unless="${club.asociacion != null}">
+                                        <span class="badge bg-light text-muted border">Sin asociación</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill">
+                                        <i class="bi bi-people-fill me-1"></i>
+                                        <span th:text="${club.jugadores != null ? club.jugadores.size() : 0}">0</span> Jugadores
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 rounded-pill">
+                                        <i class="bi bi-trophy-fill me-1"></i>
+                                        <span th:text="${club.competiciones != null ? club.competiciones.size() : 0}">0</span> Torneos
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group gap-1" role="group">
+                                        <a th:href="@{/detalle/{id}(id=${club.id})}" class="btn btn-sm btn-outline-primary rounded-2" title="Ver Detalle y Plantel">
+                                            <i class="bi bi-eye-fill"></i> Ver
+                                        </a>
+                                        <a th:href="@{/editar/{id}(id=${club.id})}" class="btn btn-sm btn-outline-secondary rounded-2" title="Editar Club">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </a>
+                                        <a th:href="@{/eliminar/{id}(id=${club.id})}" 
+                                           class="btn btn-sm btn-outline-danger rounded-2" 
+                                           onclick="return confirm('¿Está seguro de eliminar este club de MongoDB Atlas? Esta acción eliminará también sus jugadores y competiciones asociadas.');" 
+                                           title="Eliminar Club">
+                                            <i class="bi bi-trash-fill"></i> Eliminar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Estado Vacío -->
+                            <tr th:if="${#lists.isEmpty(clubes)}">
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="empty-placeholder mx-auto" style="max-width: 500px;">
+                                        <i class="bi bi-inbox text-muted display-4"></i>
+                                        <h5 class="fw-bold mt-3 text-secondary">No se encontraron clubes registrados</h5>
+                                        <p class="text-muted small mb-3">Actualmente la colección en MongoDB Atlas no contiene registros que coincidan con la búsqueda.</p>
+                                        <a th:href="@{/}" class="btn btn-primary-custom btn-sm">
+                                            <i class="bi bi-plus-circle me-1"></i> Registrar Primer Club
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-light border-0 p-3">
+                <div class="d-flex justify-content-between align-items-center text-muted small flex-wrap gap-2">
+                    <span>Mostrando <strong th:text="${clubes != null ? clubes.size() : 0}">0</strong> registros</span>
+                    <span>Conectado a clúster MongoDB Cloud Atlas (<code>DB.clubesfutbol</code>)</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/navbar :: footer}"></div>
+
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
